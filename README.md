@@ -9,7 +9,15 @@
 
 > A production-minded NestJS and TypeScript API for a turn-based trivia platform.
 
-[Live API health](https://api.triviaspirit.com/health) · [NestJS source on GitHub](https://github.com/Mohcen56/triviaspirit-backend-Nest.js) · [Local health check](http://localhost:8000/health)
+[NestJS source on GitHub](https://github.com/Mohcen56/triviaspirit-backend-Nest.js) · [Local health check](http://localhost:8000/health)
+
+## Deployment verification status
+
+`/health` and `/ready` are implemented in [AppController](src/app.controller.ts), but public checks reported 404. This source tree alone does not confirm that the public hostname runs this version. Verify the deployed commit, process entry point, hostname mapping, and reverse-proxy routing before advertising live health links. A 404 does not identify the cause. `/ready` should return 503 when its database query fails, rather than 404.
+
+After deploying this revision, request both endpoints and record the commit and HTTP responses. Deployment access is needed to resolve the public mismatch; no deployment was performed as part of this documentation update.
+
+See the [engineering case study](docs/CASE_STUDY.md) and [accessible sample gameplay round](../frontend/public/gameplay-demo.html).
 
 ## At a glance
 
@@ -30,7 +38,7 @@ This repository is the current backend: a modular NestJS application that serves
 
 The public product showcase and some older screenshots describe the **legacy Django version** of TriviaSpirit. That showcase is useful for seeing the product concept and UI, but it is not the current backend implementation and should not be used to evaluate the API architecture.
 
-The current backend is this repository: **[TriviaSpirit NestJS Backend](https://github.com/Mohcen56/triviaspirit-backend-Nest.js)**. Recruiters can verify the implementation directly in the source, CI workflow, tests, migrations, and live health endpoint above.
+The current backend is this repository: **[TriviaSpirit NestJS Backend](https://github.com/Mohcen56/triviaspirit-backend-Nest.js)**. Recruiters can verify the implementation directly in the source, CI workflow, tests, migrations, and the local health endpoint above.
 
 The frontend is maintained separately and can be pointed at this API with `BACKEND_API_URL` and `NEXT_PUBLIC_API_BASE_URL`.
 
@@ -103,7 +111,7 @@ NestJS-owned changes are isolated in explicit migrations under [`src/database/mi
 
 ### Turn-based game integrity
 
-Gameplay is explicitly turn-based. Each game receives a persisted question board, and round completion accepts only questions from that board. This prevents clients from submitting arbitrary question IDs and keeps the game state verifiable on the server.
+Gameplay consists of teams taking turns on one shared device. Online multiplayer between separate devices is not implemented. Each game receives a persisted question board, and round completion accepts only questions from that board. This prevents clients from submitting arbitrary question IDs and keeps the game state verifiable on the server.
 
 ### Reliable payments
 
@@ -238,7 +246,7 @@ npm run test:e2e
 
 The test suite covers authentication compatibility, DTO validation, ownership and visibility rules, turn-based gameplay, token rotation, signed webhook handling and replay protection, media URL behavior, and durable throttling.
 
-End-to-end tests use an isolated PostgreSQL database:
+End-to-end tests require an isolated, disposable PostgreSQL database. Without `TEST_DATABASE_URL`, the suite is skipped; a successful command exit alone is not evidence that integration tests ran. The suite drops its database after execution:
 
 ```powershell
 $env:TEST_DATABASE_URL='postgresql://postgres:postgres@localhost:5432/triviaspirit_test'
