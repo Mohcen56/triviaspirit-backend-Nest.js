@@ -78,7 +78,7 @@
   },
   "overrides": {
     "tinymce": "7.9.3",
-    "multer": "2.3.0"
+    "multer": "2.4.0"
   },
   "jest": {
     "moduleFileExtensions": [
