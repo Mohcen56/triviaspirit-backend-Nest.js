@@ -119,6 +119,7 @@ export class GameplayService {
           playerId: user.id,
           mode: mode as GameEntity['mode'],
           teams,
+          datePlayed: new Date(),
         }),
       );
       await manager.save(
