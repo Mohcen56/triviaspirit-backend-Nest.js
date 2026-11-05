@@ -442,7 +442,10 @@ export class GameplayService {
       .leftJoinAndSelect('question.category', 'category')
       .where('question.category_id IN (:...categoryIds)', { categoryIds })
       .orderBy('RANDOM()')
-      .take(count);
+      // limit (not take): the category join is many-to-one so rows can't
+      // multiply, and take() wraps the query in SELECT DISTINCT, which
+      // Postgres rejects when ordering by RANDOM().
+      .limit(count);
     if (excluded.size)
       builder.andWhere('question.id NOT IN (:...excluded)', {
         excluded: [...excluded],
